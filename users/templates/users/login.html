@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="row justify-content-center align-items-center" style="min-height: 60vh;">
+  <div class="col-md-5 col-lg-4">
+    <div class="text-center mb-4">
+        <div class="display-5 mb-2">💊</div>
+        <h3 class="fw-bold" style="color: var(--med-primary);">Acesse sua conta</h3>
+        <p class="text-muted">Gestão de medicamentos simplificada</p>
+    </div>
+
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-4 p-md-5">
+        <form method="post">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{{ next }}">
+
+          <div class="mb-3">
+            <label class="form-label fw-bold small">USUÁRIO</label>
+            <input type="text" name="username" class="form-control bg-light border-0 py-2" placeholder="Seu nome de usuário" required autofocus>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold small">SENHA</label>
+            <input type="password" name="password" class="form-control bg-light border-0 py-2" placeholder="••••••••" required>
+          </div>
+
+          <button type="submit" class="btn btn-lg w-100 text-white fw-bold shadow-sm" style="background: var(--med-primary); border-radius: 12px;">
+            Entrar
+          </button>
+        </form>
+
+        <div class="text-center mt-4">
+          <p class="text-muted small">
+            Novo por aqui? <a href="/cadastro/" class="fw-bold text-decoration-none" style="color: var(--med-secondary);">Criar conta gratuita</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

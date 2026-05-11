@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="row justify-content-center">
+  <div class="col-md-7">
+    <div class="d-flex align-items-center mb-4 gap-3 bg-white p-3 rounded-4 shadow-sm border-start border-4 border-teal" style="border-left-color: var(--med-primary) !important;">
+      <div class="text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow"
+           style="width:64px;height:64px;font-size:24px; background: linear-gradient(135deg, var(--med-primary), var(--med-secondary));">
+        {{ user.username|first|upper }}
+      </div>
+      <div>
+        <h4 class="mb-0 fw-bold" style="color: var(--med-primary);">{{ user.username }}</h4>
+        <small class="text-muted">Paciente desde {{ user.date_joined|date:"d/m/Y" }}</small>
+      </div>
+    </div>
+
+    <div class="card border-0">
+      <div class="card-body p-0">
+        <h5 class="mb-4 fw-bold"><i class="me-2">📝</i>Editar Informações Pessoais</h5>
+
+        <form method="post">
+          {% csrf_token %}
+          <div class="row">
+            {% for field in form %}
+            <div class="col-12 mb-3">
+              <label class="form-label fw-semibold small text-uppercase text-muted">{{ field.label }}</label>
+              {{ field }}
+              {% if field.errors %}
+                <div class="text-danger small mt-1">{% for erro in field.errors %}{{ erro }}{% endfor %}</div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-success px-4" style="background-color: var(--med-primary); border: none;">
+              Atualizar Perfil
+            </button>
+            <a href="/dashboard" class="btn btn-light px-4">Voltar</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

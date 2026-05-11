@@ -1,0 +1,24 @@
+# Ambiente virtual
+.venv/
+venv/
+env/
+
+# Variaveis de ambiente — NUNCA vai ao GitHub
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.so
+
+# Django
+db.sqlite3
+*.log
+media/
+staticfiles/
+
+# PyCharm
+.idea/
