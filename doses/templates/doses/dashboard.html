@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="mb-0">Dashboard — {{ hoje|date:"d/m/Y" }}</h4>
+  <a href="/tratamentos/novo/" class="btn btn-primary btn-sm">+ Novo Tratamento</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3"><div class="card text-center p-3 border-success"><h3 class="text-success">{{ tomadas.count }}</h3><small>Tomadas</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3 border-danger"><h3 class="text-danger">{{ atrasadas.count }}</h3><small>Atrasadas</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3 border-warning"><h3 class="text-warning">{{ futuras.count }}</h3><small>Agendadas</small></div></div>
+  <div class="col-6 col-md-3"><div class="card text-center p-3 border-secondary"><h3 class="text-secondary">{{ perdidas.count }}</h3><small>Perdidas</small></div></div>
+</div>
+
+{% if atrasadas %}
+<h5 class="text-danger">⚠️ Atrasadas</h5>
+{% for d in atrasadas %}
+<div class="card p-3 mb-2 vermelho d-flex flex-row justify-content-between align-items-center">
+  <div>
+    <strong>{{ d.tratamento.medicamento.nome }}</strong>
+    <span class="text-muted ms-2">{{ d.tratamento.medicamento.dosagem }}</span><br>
+    <small>Prevista {{ d.horario_planejado|time:"H:i" }}
+    {% if d.recalculada %}<span class="badge bg-warning text-dark ms-1">recalculada</span>{% endif %}
+    </small>
+  </div>
+  <div class="d-flex gap-2">
+    <form method="post" action="/doses/{{ d.pk }}/confirmar/">{% csrf_token %}
+      <button class="btn btn-success btn-sm">✓ Tomei agora</button>
+    </form>
+    <form method="post" action="/doses/{{ d.pk }}/pular/">{% csrf_token %}
+      <button class="btn btn-outline-secondary btn-sm">Pular</button>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if futuras %}
+<h5 class="text-warning mt-3">🕐 Proximas</h5>
+{% for d in futuras %}
+<div class="card p-3 mb-2 amarelo d-flex flex-row justify-content-between align-items-center">
+  <div>
+    <strong>{{ d.tratamento.medicamento.nome }}</strong>
+    <span class="text-muted ms-2">{{ d.tratamento.medicamento.dosagem }}</span><br>
+    <small>Agendada {{ d.horario_planejado|time:"H:i" }}
+    {% if d.recalculada %}<span class="badge bg-warning text-dark ms-1">recalculada</span>{% endif %}
+    </small>
+  </div>
+  <form method="post" action="{% url 'dose_confirmar' d.pk %}">{% csrf_token %}
+    <button class="btn btn-success btn-sm">✓ Tomei agora</button>
+  </form>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if tomadas %}
+<h5 class="text-success mt-3">✅ Concluidas</h5>
+{% for d in tomadas %}
+<div class="card p-3 mb-2 verde">
+  <strong>{{ d.tratamento.medicamento.nome }}</strong>
+  <span class="text-muted ms-2">{{ d.tratamento.medicamento.dosagem }}</span>
+  <small class="ms-2 text-muted">tomada as {{ d.horario_real|time:"H:i" }}</small>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if not atrasadas and not futuras and not tomadas %}
+<div class="alert alert-info mt-4">
+  Nenhuma dose para hoje.
+  <a href="/medicamentos/novo/">Cadastre um medicamento</a> para comecar.
+</div>
+{% endif %}
+{% endblock %}

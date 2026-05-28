@@ -16,10 +16,7 @@ def pagina_cadastro(request):
                 return redirect('dashboard')
         else:
             messages.error(request, 'Corrija os erros abaixo.')
-
-    # CORREÇÃO AQUI: {'form': form} com dois pontos
     return render(request, 'users/cadastro.html', {'form': form})
-
 
 def pagina_login(request):
     if request.method == 'POST':
@@ -57,5 +54,4 @@ def pagina_perfil(request):
 # Create your views here.
 @login_required
 def pagina_dashboard(request):
-    # Uma view simples que apenas renderiza o template
     return render(request, 'users/dashboard.html')

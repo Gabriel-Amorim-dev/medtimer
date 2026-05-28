@@ -19,14 +19,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Apps que você realmente criou com 'startapp':
     'users',
     'medications',
     'treatments',
     'doses',
     'notifications',
-    # REMOVA 'reminders' e 'dashboard' daqui se não for usá-los,
-    # ou crie-os no terminal primeiro!
 ]
 
 MIDDLEWARE = [
@@ -44,10 +41,11 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -88,3 +86,6 @@ AUTH_USER_MODEL = 'users.Usuario'
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/perfil'
 LOGOUT_REDIRECT_URL = '/login/'
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 3600

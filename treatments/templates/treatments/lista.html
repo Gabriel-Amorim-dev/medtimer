@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<!-- ── Doses do dia ─────────────────────────────────────────────── -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Doses de hoje — {{ hoje|date:"d/m/Y" }}</h4>
+  <a href="/tratamentos/novo/" class="btn btn-primary btn-sm">+ Novo Tratamento</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card text-center p-3 border-success">
+      <h3 class="text-success mb-0">{{ tomadas.count }}</h3>
+      <small class="text-muted">Tomadas</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center p-3 border-danger">
+      <h3 class="text-danger mb-0">{{ atrasadas.count }}</h3>
+      <small class="text-muted">Atrasadas</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center p-3 border-warning">
+      <h3 class="text-warning mb-0">{{ futuras.count }}</h3>
+      <small class="text-muted">Agendadas</small>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card text-center p-3 border-secondary">
+      <h3 class="text-secondary mb-0">{{ perdidas.count }}</h3>
+      <small class="text-muted">Perdidas</small>
+    </div>
+  </div>
+</div>
+
+{% if atrasadas %}
+<h6 class="text-danger fw-bold">⚠️ Atrasadas</h6>
+{% for d in atrasadas %}
+<div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center"
+     style="border-left: 4px solid #dc3545; background:#fff5f5;">
+  <div>
+    <strong>{{ d.tratamento.medicamento.nome }}</strong>
+    <span class="text-muted ms-2 small">{{ d.tratamento.medicamento.dosagem }}</span><br>
+    <small class="text-danger">Prevista {{ d.horario_planejado|time:"H:i" }}</small>
+    {% if d.recalculada %}
+    <span class="badge bg-warning text-dark ms-1">recalculada</span>
+    {% endif %}
+  </div>
+  <div class="d-flex gap-2">
+    <form method="post" action="/doses/{{ d.pk }}/confirmar/">{% csrf_token %}
+      <button class="btn btn-success btn-sm">✓ Tomei agora</button>
+    </form>
+    <form method="post" action="/doses/{{ d.pk }}/pular/">{% csrf_token %}
+      <button class="btn btn-outline-secondary btn-sm">Pular</button>
+    </form>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if futuras %}
+<h6 class="text-warning fw-bold mt-3">🕐 Próximas doses</h6>
+{% for d in futuras %}
+<div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center"
+     style="border-left: 4px solid #ffc107; background:#fffdf0;">
+  <div>
+    <strong>{{ d.tratamento.medicamento.nome }}</strong>
+    <span class="text-muted ms-2 small">{{ d.tratamento.medicamento.dosagem }}</span><br>
+    <small class="text-muted">Agendada {{ d.horario_planejado|time:"H:i" }}</small>
+    {% if d.recalculada %}
+    <span class="badge bg-warning text-dark ms-1">recalculada</span>
+    {% endif %}
+  </div>
+  <form method="post" action="/doses/{{ d.pk }}/confirmar/">{% csrf_token %}
+    <button class="btn btn-success btn-sm">✓ Tomei agora</button>
+  </form>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if tomadas %}
+<h6 class="text-success fw-bold mt-3">✅ Concluídas hoje</h6>
+{% for d in tomadas %}
+<div class="card p-3 mb-2"
+     style="border-left: 4px solid #28a745; background:#f0fff4;">
+  <strong>{{ d.tratamento.medicamento.nome }}</strong>
+  <span class="text-muted ms-2 small">{{ d.tratamento.medicamento.dosagem }}</span>
+  <small class="ms-2 text-muted">tomada às {{ d.horario_real|time:"H:i" }}</small>
+</div>
+{% endfor %}
+{% endif %}
+
+{% if not atrasadas and not futuras and not tomadas %}
+<div class="alert alert-info">
+  Nenhuma dose agendada para hoje.
+</div>
+{% endif %}
+
+<!-- ── Divisor ──────────────────────────────────────────────────── -->
+<hr class="my-4">
+
+<!-- ── Lista de tratamentos ────────────────────────────────────── -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Meus Tratamentos</h4>
+</div>
+
+{% for t in tratamentos %}
+<div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center">
+  <div>
+    <strong>{{ t.medicamento.nome }}</strong>
+    <span class="badge ms-2
+      bg-{% if t.status == 'ativo' %}success
+      {% elif t.status == 'pausado' %}warning text-dark
+      {% else %}secondary{% endif %}">
+      {{ t.status }}
+    </span><br>
+    <small class="text-muted">
+      a cada {{ t.intervalo_horas }}h |
+      início {{ t.horario_inicial|time:"H:i" }} |
+      desde {{ t.data_inicio|date:"d/m/Y" }}
+    </small>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'trat_editar' t.pk %}" class="btn btn-outline-primary btn-sm">Editar</a>
+    <form method="post" action="{% url 'trat_pausar' t.pk %}">{% csrf_token %}
+      <button class="btn btn-outline-warning btn-sm">
+        {% if t.status == 'ativo' %}Pausar{% else %}Retomar{% endif %}
+      </button>
+    </form>
+  </div>
+</div>
+{% empty %}
+<p class="text-muted">
+  Nenhum tratamento cadastrado.
+  <a href="{% url 'trat_criar' %}">Criar agora</a>
+</p>
+{% endfor %}
+
+{% endblock %}

@@ -9,7 +9,7 @@ class CadastroForm(UserCreationForm):
         label='E-mail',
         widget=forms.EmailInput(attrs={
             'class': 'form-control',
-            'placeholder': 'seu@email.com'
+            'placeholder': 'Ex: seu@email.com'
         })
     )
 

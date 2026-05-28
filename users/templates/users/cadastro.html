@@ -15,8 +15,20 @@
           <div class="mb-3">
             <label class="form-label fw-bold small text-muted">{{ field.label|upper }}</label>
             {{ field }}
+            
+            {% if field.name == 'password' or field.name == 'password1' %}
+              <div class="mt-2 p-3 bg-light rounded-3 border">
+                <p class="small fw-bold mb-2 text-muted">A senha deve conter:</p>
+                <ul class="list-unstyled mb-0" style="font-size: 0.8rem;">
+                  <li class="mb-1 text-muted"><i class="bi bi-check2-circle me-1"></i> No mínimo 8 caracteres</li>
+                  <li class="mb-1 text-muted"><i class="bi bi-check2-circle me-1"></i> Letras e números</li>
+                  <li class="text-muted"><i class="bi bi-check2-circle me-1"></i> Não pode ser similar ao nome de usuário</li>
+                </ul>
+              </div>
+            {% endif %}
+
             {% if field.errors %}
-                <div class="text-danger small">{% for erro in field.errors %}{{ erro }}{% endfor %}</div>
+                <div class="text-danger small mt-1">{% for erro in field.errors %}{{ erro }}{% endfor %}</div>
             {% endif %}
           </div>
           {% endfor %}

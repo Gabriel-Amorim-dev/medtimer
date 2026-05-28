@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-3 pb-3" style="border-bottom: 1.5px solid #ccfbf1;">
+  <h4 class="fw-bold mb-0 d-flex align-items-center gap-2" style="color: var(--med-primary);">
+    🔔 Notificações
+    {% if notificacoes %}
+      <span class="badge rounded-pill" style="background:#ccfbf1; color:#0f766e; font-size:13px;">
+        {{ notificacoes|length }} encontrada{{ notificacoes|length|pluralize }}
+      </span>
+    {% endif %}
+  </h4>
+
+  {% if notificacoes %}
+  <div class="d-flex gap-2">
+    <form method="post" action="{% url 'notif_todas_lidas' %}">
+      {% csrf_token %}
+      <button class="btn btn-sm d-flex align-items-center gap-1"
+              style="border: 1px solid var(--med-secondary); color: var(--med-primary); background: white; border-radius: 8px;">
+        ✅ Marcar todas como lidas
+      </button>
+    </form>
+    <form method="post" action="{% url 'notif_limpar_todas' %}">
+      {% csrf_token %}
+      <button class="btn btn-sm d-flex align-items-center gap-1"
+              style="border: 1px solid #fca5a5; color: #b91c1c; background: #fef2f2; border-radius: 8px;">
+        🗑️ Limpar todas
+      </button>
+    </form>
+  </div>
+  {% endif %}
+</div>
+
+<form method="get" class="d-flex align-items-center gap-2 flex-wrap mb-4 p-3"
+      style="background: white; border: 0.5px solid #d1fae5; border-radius: 12px;">
+  <div>{{ form.tipo }}</div>
+  <div>{{ form.lida }}</div>
+  <button type="submit" class="btn btn-sm text-white px-3"
+          style="background: var(--med-primary); border: none; border-radius: 8px;">
+    Filtrar
+  </button>
+</form>
+
+{% for n in notificacoes %}
+<div class="p-3 mb-2 d-flex justify-content-between align-items-center"
+     style="background: white;
+            border: 0.5px solid #e2e8f0;
+            border-radius: 12px;
+            {% if not n.lida %}border-left: 3px solid var(--med-secondary); border-radius: 0 12px 12px 0;{% endif %}">
+
+  <div class="d-flex flex-column gap-1">
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge rounded-pill"
+        style="font-size: 11px;
+               {% if n.tipo == 'escalada' %}background:#fee2e2; color:#b91c1c;
+               {% elif n.tipo == 'recalculo' %}background:#fef9c3; color:#854d0e;
+               {% else %}background:#ccfbf1; color:#0f766e;{% endif %}">
+        {{ n.get_tipo_display }}
+      </span>
+      <strong style="font-size: 14px; color: #1e293b;">
+        {{ n.dose.tratamento.medicamento.nome }}
+      </strong>
+      {% if not n.lida %}
+        <span class="badge rounded-pill" style="background:#dbeafe; color:#1e40af; font-size: 11px;">Nova</span>
+      {% endif %}
+    </div>
+    <small style="color: #94a3b8;">{{ n.enviada_em|date:"d/m/Y \à\s H:i" }}</small>
+  </div>
+
+  {% if not n.lida %}
+  <form method="post" action="{% url 'notif_lida' n.pk %}">
+    {% csrf_token %}
+    <button class="btn btn-sm"
+            style="border: 1px solid #a7f3d0; color: var(--med-primary); background: white; border-radius: 8px; font-size: 12px;">
+      Marcar lida
+    </button>
+  </form>
+  {% endif %}
+</div>
+{% empty %}
+<div class="text-center py-5 text-muted">
+  <div style="font-size: 2.5rem;">🔕</div>
+  <p class="mt-2 mb-0">Nenhuma notificação encontrada.</p>
+</div>
+{% endfor %}
+
+{% endblock %}

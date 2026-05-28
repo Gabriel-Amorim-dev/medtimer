@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+    <div>
+        <h3 class="fw-bold mb-0" style="color: var(--med-primary);">
+            <span class="me-2">💊</span> Meus Medicamentos
+        </h3>
+        <p class="text-muted small mb-0">Gerencie sua farmácia pessoal e horários.</p>
+    </div>
+    <a href="{% url 'med_criar' %}" class="btn btn-lg text-white shadow-sm px-4 rounded-pill" 
+       style="background: var(--med-primary); border: none;">
+       <i class="me-1">+</i> Novo Medicamento
+    </a>
+    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary shadow-sm px-1">Voltar</a>
+</div>
+
+<div class="row g-3">
+    {% for med in medicamentos %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden med-card-hover">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="rounded-3 p-3 bg-light" style="color: var(--med-secondary);">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-capsule" viewBox="0 0 16 16">
+                            <path d="M1.828 8.9 8.9 1.827a4 4 0 1 1 5.657 5.657l-7.07 7.071a4 4 0 1 1-5.657-5.657m9.193-4.243 1.414 1.414-4.95 4.95-1.414-1.414z"/>
+                        </svg>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                            <span style="font-size: 1.2rem;">⋮</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                            <li><a class="dropdown-item py-2" href="{% url 'med_editar' med.pk %}">✏️ Editar</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-2 text-danger" href="{% url 'med_deletar' med.pk %}">🗑️ Remover</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-1" style="color: var(--med-primary);">{{ med.nome }}</h5>
+                <span class="badge rounded-pill mb-3" style="background-color: var(--med-bg); color: var(--med-primary); border: 1px solid var(--med-accent);">
+                    {{ med.dosagem }}
+                </span>
+
+                {% if med.observacoes %}
+                <div class="mt-2 p-2 rounded bg-light border-start border-3 border-info">
+                    <p class="small text-muted mb-0">
+                        <strong>Obs:</strong> {{ med.observacoes }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer bg-transparent border-0 p-4 pt-0">
+                <a href="{% url 'med_editar' med.pk %}" class="btn btn-sm w-100 btn-light fw-bold text-muted rounded-pill">
+                    Ver detalhes
+                </a>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="text-center py-5 bg-white rounded-4 shadow-sm border-2 border-dashed">
+            <div class="display-1 text-light mb-3">📦</div>
+            <h5 class="text-muted">Sua prateleira está vazia</h5>
+            <p class="small text-muted mb-4">Adicione seus remédios para começar o acompanhamento.</p>
+            <a href="{% url 'med_criar' %}" class="btn btn-success rounded-pill px-4" style="background-color: var(--med-primary);">
+                Cadastrar agora
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+    .med-card-hover {
+        transition: all 0.3s ease;
+        border: 1px solid transparent !important;
+    }
+    .med-card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08) !important;
+        border-color: var(--med-accent) !important;
+    }
+    .border-dashed {
+        border: 2px dashed #e2e8f0;
+    }
+</style>
+
+{% endblock %}

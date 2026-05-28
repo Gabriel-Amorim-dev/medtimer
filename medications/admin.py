@@ -1,10 +1,8 @@
 from django.contrib import admin
+from .models import Medicamento
 
-from medications import models
-
-@admin.register(models.Medicamento)
-class DosesAdmin(admin.ModelAdmin):
-    list_display = 'id', 'usuario', 'nome', 'dosagem', 'observacoes', 'ativo', 'criado_em'
-
-
-# Register your models here.
+@admin.register(Medicamento)
+class MedicamentoAdmin(admin.ModelAdmin):
+    list_display  = ('nome', 'dosagem', 'usuario', 'ativo', 'criado_em')
+    list_filter   = ('ativo',)
+    search_fields = ('nome',)
