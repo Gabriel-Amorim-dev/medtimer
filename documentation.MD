@@ -249,9 +249,6 @@ Acesse a aplicação em: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 - [ ] Arquivo `.env` configurado
 - [ ] Banco de dados PostgreSQL em execução
 - [ ] Migrações aplicadas (`python manage.py migrate`)
-- [ ] Redis em execução (se for usar notificações)
-- [ ] Workers do Celery iniciados (se for usar notificações)
-
 ---
 
 ## Painel Administrativo
