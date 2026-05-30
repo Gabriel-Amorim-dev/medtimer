@@ -13,10 +13,9 @@
 5. [Variáveis de Ambiente](#variáveis-de-ambiente)
 6. [Banco de Dados](#banco-de-dados)
 7. [Módulos da Aplicação](#módulos-da-aplicação)
-8. [Filas e Tarefas Assíncronas (Celery)](#filas-e-tarefas-assíncronas-celery)
-9. [Executando o Projeto](#executando-o-projeto)
-10. [Painel Administrativo](#painel-administrativo)
-11. [Contribuindo com o Projeto](#contribuindo-com-o-projeto)
+8. [Executando o Projeto](#executando-o-projeto)
+9. [Painel Administrativo](#painel-administrativo)
+10. [Contribuindo com o Projeto](#contribuindo-com-o-projeto)
 
 ---
 
