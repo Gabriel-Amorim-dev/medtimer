@@ -33,8 +33,15 @@ def editar(request, pk):
 def deletar(request, pk):
     med = get_object_or_404(Medicamento, pk=pk, usuario=request.user)
     if request.method == 'POST':
+
+        try:
+            med.tratamento.delete()
+        except Exception:
+            pass
+
         med.ativo = False
         med.save()
-        messages.success(request,f'Medicamento {med.nome} removido com sucesso!')
+        messages.success(request, f'Medicamento "{med.nome}" e seu tratamento foram removidos.')
         return redirect('med_lista')
+
     return render(request, 'medications/confirm_delete.html', {'objeto': med, 'nome': med.nome})

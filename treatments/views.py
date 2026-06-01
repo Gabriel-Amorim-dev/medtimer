@@ -66,20 +66,30 @@ def pausar(request, pk):
     return redirect('trat_lista')
 
 def _gerar_doses(tratamento):
+    from .utils import ajustar_para_horario_vigilia  # or top-level import
 
-
-    fuso          = pytz.timezone(settings.TIME_ZONE)
-    intervalo     = timedelta(hours=tratamento.intervalo_horas)
+    fuso           = pytz.timezone(settings.TIME_ZONE)
+    intervalo      = timedelta(hours=tratamento.intervalo_horas)
     primeiro_naive = datetime.combine(tratamento.data_inicio, tratamento.horario_inicial)
-    primeiro      = fuso.localize(primeiro_naive)
-    horario_atual = primeiro
-    doses         = []
+    primeiro       = fuso.localize(primeiro_naive)
+    horario_atual  = primeiro
+    usuario        = tratamento.medicamento.usuario  # ← add this
+    doses          = []
 
     while True:
         if tratamento.data_fim and horario_atual.date() > tratamento.data_fim:
             break
         if not tratamento.data_fim and (horario_atual - primeiro).days > 90:
             break
+
+        horario_atual = ajustar_para_horario_vigilia(usuario, horario_atual)  # ← add this
+
+
+        if tratamento.data_fim and horario_atual.date() > tratamento.data_fim:
+            break
+        if not tratamento.data_fim and (horario_atual - primeiro).days > 90:
+            break
+
         doses.append(Dose(
             tratamento=tratamento,
             horario_planejado=horario_atual,
@@ -88,7 +98,7 @@ def _gerar_doses(tratamento):
         horario_atual += intervalo
 
     doses_criadas = Dose.objects.bulk_create(doses)
-    
+
     if doses_criadas:
         primeira = doses_criadas[0]
         Notificacao.objects.create(

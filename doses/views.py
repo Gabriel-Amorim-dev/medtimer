@@ -2,16 +2,14 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from datetime import timedelta
 from .models import Dose
+from datetime import datetime, time, timedelta
 
 @login_required
 def dashboard(request):  
 
     hoje = timezone.now().date()
     agora = timezone.now()
-
-    call_command('gerar_notificacoes')
     
     doses_hoje = Dose.objects.filter(
         tratamento__medicamento__usuario=request.user,
@@ -49,6 +47,34 @@ def confirmar(request, pk):
             messages.success(request, 'Dose confirmada no horario')
     return redirect('dashboard')
 
+
+def ajustar_para_horario_vigilia(usuario, proximo_horario):
+    if not usuario.horario_sono_inicio or not usuario.horario_sono_fim:
+        return proximo_horario
+
+
+    for _ in range(10):
+        hora_atual = proximo_horario.time()
+        inicio = usuario.horario_sono_inicio
+        fim = usuario.horario_sono_fim
+
+        if inicio > fim:
+            if hora_atual >= inicio or hora_atual < fim:
+                if hora_atual >= inicio:
+                    data_ajustada = proximo_horario.date() + timedelta(days=1)
+                else:
+                    data_ajustada = proximo_horario.date()
+                proximo_horario = datetime.combine(data_ajustada, fim, tzinfo=proximo_horario.tzinfo)
+                continue
+        else:
+            if inicio <= hora_atual < fim:
+                proximo_horario = datetime.combine(proximo_horario.date(), fim, tzinfo=proximo_horario.tzinfo)
+                continue
+
+        break
+
+    return proximo_horario
+
 @login_required
 def pular(request, pk):
     dose = get_object_or_404(Dose, pk=pk, tratamento__medicamento__usuario=request.user)
@@ -58,16 +84,23 @@ def pular(request, pk):
         messages.warning(request, 'Dose marcada como perdida.')
     return redirect('dashboard')
 
+
 def _recalcular(tratamento, horario_real):
-    intervalo     = timedelta(hours=tratamento.intervalo_horas)
+    usuario = tratamento.medicamento.usuario
+    intervalo = timedelta(hours=tratamento.intervalo_horas)
+
     doses_futuras = Dose.objects.filter(
         tratamento=tratamento,
         status='pendente',
         horario_planejado__gt=horario_real
     ).order_by('horario_planejado')
-    novo = horario_real + intervalo
+
+    novo_horario = horario_real + intervalo
+
     for d in doses_futuras:
-        d.horario_planejado = novo
-        d.recalculada       = True
-        novo               += intervalo
-    Dose.objects.bulk_update(doses_futuras, ['horario_planejado','recalculada'])
+        novo_horario = ajustar_para_horario_vigilia(usuario, novo_horario)
+        d.horario_planejado = novo_horario
+        d.recalculada = True
+        novo_horario = novo_horario + intervalo
+
+    Dose.objects.bulk_update(doses_futuras, ['horario_planejado', 'recalculada'])

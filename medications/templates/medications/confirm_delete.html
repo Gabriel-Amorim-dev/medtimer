@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
 {% block conteudo %}
-<div class="card p-4 col-md-5 mx-auto mt-5 text-center">
-  <h5>Remover "{{ nome }}"?</h5>
-  <p class="text-muted">O historico de doses sera mantido.</p>
-  <form method="post" class="d-flex gap-2 justify-content-center">
+<div class="card p-4 col-md-5 mx-auto mt-5">
+
+  <h5 class="text-danger mb-1">⚠️ Remover medicamento?</h5>
+  <p class="text-muted mb-3">Esta acao nao pode ser desfeita.</p>
+
+  <div class="alert alert-warning p-2 small mb-3">
+    <strong>O que sera removido:</strong><br>
+    ✗ Medicamento: <strong>{{ nome }}</strong><br>
+    ✗ Tratamento vinculado (se existir)<br>
+    ✗ Todas as doses agendadas<br>
+    ✗ Todas as notificacoes relacionadas
+  </div>
+
+  <form method="post" class="d-flex gap-2">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Confirmar</button>
+    <button type="submit" class="btn btn-danger">Confirmar remocao</button>
     <a href="{% url 'med_lista' %}" class="btn btn-outline-secondary">Cancelar</a>
   </form>
+
 </div>
 {% endblock %}
