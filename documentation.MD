@@ -73,7 +73,7 @@ medtimer/
 
 **`doses/`** — Controla as dosagens de cada medicamento dentro de um tratamento, incluindo quantidade, frequência e horários de administração.
 
-**`notifications/`** — Lógica de envio de alertas e lembretes ao usuário, possivelmente integrada ao Celery para agendamento assíncrono de notificações nos horários corretos.
+**`notifications/`** — Lógica de envio de alertas e lembretes ao usuário
 
 **`users/`** — Gerenciamento de contas de usuário, registro, login, logout e perfil. Também controla permissões de acesso às funcionalidades da plataforma.
 
@@ -218,7 +218,7 @@ Controla quando e como cada medicamento deve ser tomado dentro de um tratamento:
 
 ### Notificações (`notifications`)
 
-Responsável por alertar os usuários nos horários corretos para que tomem seus medicamentos. Integra-se ao Celery e Redis para agendamento assíncrono de lembretes.
+Responsável por alertar os usuários nos horários corretos para que tomem seus medicamentos.
 
 **Operações principais:** disparar notificações nos horários configurados para cada dose.
 
